@@ -76,11 +76,7 @@ func (c *EvalContext) ShouldUpdateAlertState() bool {
 }
 
 func (c *EvalContext) ShouldSendNotification() bool {
-	if (c.PrevAlertState == m.AlertStatePending) && (c.Rule.State == m.AlertStateOK) {
-		return false
-	}
-
-	return true
+	return (c.Rule.State != m.AlertStateOK)
 }
 
 func (a *EvalContext) GetDurationMs() float64 {
