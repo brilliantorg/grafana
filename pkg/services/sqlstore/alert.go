@@ -241,7 +241,7 @@ func SetAlertState(cmd *m.SetAlertStateCommand) error {
 		}
 
 		if alert.State == cmd.State {
-			return m.ErrRequiresNewState
+			return nil  // changed to always set alert state
 		}
 
 		alert.State = cmd.State

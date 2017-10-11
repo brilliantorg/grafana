@@ -60,11 +60,6 @@ func (handler *DefaultResultHandler) Handle(evalContext *EvalContext) error {
 				return err
 			}
 
-			if err == m.ErrRequiresNewState {
-				handler.log.Info("Alert already updated")
-				return nil
-			}
-
 			handler.log.Error("Failed to save state", "error", err)
 		}
 
