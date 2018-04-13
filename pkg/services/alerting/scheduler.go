@@ -8,6 +8,10 @@ import (
 	"github.com/grafana/grafana/pkg/models"
 )
 
+const TICK_HOUR int = 16
+const TICK_MINUTE int = 00
+const TICK_SECOND int = 00
+
 type SchedulerImpl struct {
 	jobs map[int64]*Job
 	log  log.Logger
@@ -49,25 +53,16 @@ func (s *SchedulerImpl) Update(rules []*Rule) {
 }
 
 func (s *SchedulerImpl) Tick(tickTime time.Time, execQueue chan *Job) {
-	now := tickTime.Unix()
+  now := time.Now()
+  now_unixtime := now.Unix()
+  next_job_queue_unixtime := time.Date(now.Year(), now.Month(), now.Day(), TICK_HOUR, TICK_MINUTE, TICK_SECOND, 00, time.UTC).Unix()
 
 	for _, job := range s.jobs {
-		if job.Running || job.Rule.State == models.AlertStatePaused {
+    if job.Running || job.Rule.State == models.AlertStatePaused {
 			continue
 		}
-
-		if job.OffsetWait && now%job.Offset == 0 {
-			job.OffsetWait = false
-			s.enque(job, execQueue)
-			continue
-		}
-
-		if now%job.Rule.Frequency == 0 {
-			if job.Offset > 0 {
-				job.OffsetWait = true
-			} else {
-				s.enque(job, execQueue)
-			}
+    if next_job_queue_unixtime%now_unixtime == 0 {
+        s.enque(job, execQueue)
 		}
 	}
 }
